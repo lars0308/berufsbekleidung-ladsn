@@ -3,6 +3,7 @@ import { getProductBySlug, products, categories } from "@/lib/products";
 import { Badge } from "@/components/ui/Badge";
 import { AddToCartForm } from "@/components/shop/AddToCartForm";
 import { formatEUR } from "@/lib/format";
+import { pexelsUrl } from "@/lib/images";
 
 export function generateStaticParams() {
   return products.map((p) => ({ slug: p.slug }));
@@ -24,7 +25,7 @@ export default async function ProductPage({
       <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
         <div className="aspect-[3/4] overflow-hidden rounded-sm bg-paper-dim">
           <img
-            src={`https://picsum.photos/seed/${product.imageSeed}/900/1200`}
+            src={pexelsUrl(product.imageId, 900, 1200)}
             alt={product.name}
             className="h-full w-full object-cover"
           />

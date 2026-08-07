@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { categories } from "@/lib/products";
+import { pexelsUrl } from "@/lib/images";
 
-const imagery: Record<string, string> = {
-  handwerk: "krueger-cat-handwerk",
-  medizin: "krueger-cat-medizin",
-  gastro: "krueger-cat-gastro",
-  zunft: "krueger-cat-zunft",
+const imagery: Record<string, number> = {
+  handwerk: 31161593,
+  medizin: 4066427,
+  gastro: 6036009,
+  zunft: 31759241,
 };
 
 export function CategoryGrid() {
@@ -23,7 +24,7 @@ export function CategoryGrid() {
             className="group relative aspect-[3/4] overflow-hidden rounded-sm"
           >
             <img
-              src={`https://picsum.photos/seed/${imagery[cat.id]}/600/800`}
+              src={pexelsUrl(imagery[cat.id], 600, 800)}
               alt=""
               className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
             />

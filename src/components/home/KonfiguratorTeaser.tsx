@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/Button";
+import { pexelsUrl } from "@/lib/images";
 
 export function KonfiguratorTeaser() {
   return (
@@ -22,7 +23,7 @@ export function KonfiguratorTeaser() {
 
         <div className="aspect-[4/3] overflow-hidden rounded-sm bg-ink-soft">
           <img
-            src="https://picsum.photos/seed/krueger-konfigurator-teaser/900/700"
+            src={pexelsUrl(19599223, 900, 700)}
             alt="Vorschau des 3D-Konfigurators von Berufskleidungshaus Krüger"
             className="h-full w-full object-cover"
           />

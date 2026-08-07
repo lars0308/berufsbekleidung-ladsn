@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/Badge";
 import { formatEUR } from "@/lib/format";
 import { cn } from "@/lib/cn";
+import { pexelsUrl } from "@/lib/images";
 import type { Product } from "@/lib/products";
 
 export function ProductCard({
@@ -31,7 +32,7 @@ export function ProductCard({
     >
       <div className="aspect-[3/4] overflow-hidden rounded-sm bg-paper-dim">
         <img
-          src={`https://picsum.photos/seed/${product.imageSeed}/700/900`}
+          src={pexelsUrl(product.imageId, 700, 900)}
           alt={product.name}
           className="h-full w-full object-cover transition-transform duration-500 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
         />

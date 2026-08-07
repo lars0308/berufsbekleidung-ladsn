@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import { ShieldCheck, Truck, MapPin } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/Button";
+import { pexelsUrl } from "@/lib/images";
 
 const badges = [
   { icon: ShieldCheck, label: "DGUV-zertifiziert" },
@@ -73,7 +74,7 @@ export function Hero() {
           className="relative aspect-[4/5] w-full overflow-hidden rounded-sm lg:aspect-[3/4]"
         >
           <img
-            src="https://picsum.photos/seed/krueger-hero-handwerker/900/1200"
+            src={pexelsUrl(15200454, 900, 1200)}
             alt="Handwerker in Arbeitskleidung von Berufskleidungshaus Krüger"
             className="h-full w-full object-cover"
           />

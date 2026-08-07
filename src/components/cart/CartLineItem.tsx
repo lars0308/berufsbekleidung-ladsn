@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Trash, Minus, Plus } from "@phosphor-icons/react";
 import { formatEUR } from "@/lib/format";
 import { useCartStore } from "@/lib/cart-store";
+import { pexelsUrl } from "@/lib/images";
 import type { Product } from "@/lib/products";
 
 export function CartLineItem({
@@ -25,7 +26,7 @@ export function CartLineItem({
         className="h-24 w-20 shrink-0 overflow-hidden rounded-sm bg-paper-dim"
       >
         <img
-          src={`https://picsum.photos/seed/${product.imageSeed}/200/260`}
+          src={pexelsUrl(product.imageId, 200, 260)}
           alt={product.name}
           className="h-full w-full object-cover"
         />

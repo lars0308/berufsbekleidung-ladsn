@@ -17,7 +17,7 @@ export interface Product {
   sizes: string[];
   description: string;
   badges: string[];
-  imageSeed: string;
+  imageId: number;
 }
 
 export const products: Product[] = [
@@ -32,7 +32,7 @@ export const products: Product[] = [
     description:
       "Verstärktes Canvas-Gewebe mit Vollstretch-Einsätzen an Knie und Bund. Cordura-Kniepolstertaschen, zwölf Fächer für Werkzeug und Zollstock.",
     badges: ["Bestseller", "Cordura verstärkt"],
-    imageSeed: "krueger-arbeitshose-canvas",
+    imageId: 11429201,
   },
   {
     id: "p-02",
@@ -45,7 +45,7 @@ export const products: Product[] = [
     description:
       "Winddichte, wasserabweisende Softshelljacke mit atmungsaktiver Membran. Reflexbesatz für Sichtbarkeit bei Dämmerung.",
     badges: ["Wind- & wasserdicht"],
-    imageSeed: "krueger-softshelljacke-graphit",
+    imageId: 28196526,
   },
   {
     id: "p-03",
@@ -58,7 +58,7 @@ export const products: Product[] = [
     description:
       "Zertifiziert nach EN ISO 20471 Klasse 2. Reißverschluss, zwei Brusttaschen, maschinenwaschbar bis 60 °C.",
     badges: ["DGUV-zertifiziert"],
-    imageSeed: "krueger-warnweste",
+    imageId: 8293699,
   },
   {
     id: "p-04",
@@ -71,7 +71,7 @@ export const products: Product[] = [
     description:
       "Stahlkappe, durchtrittsichere Zwischensohle, rutschhemmend nach SRC. Wasserdichtes Obermaterial aus Vollnarbenleder.",
     badges: ["S3 SRC", "DGUV-zertifiziert"],
-    imageSeed: "krueger-sicherheitsstiefel",
+    imageId: 2929286,
   },
   {
     id: "p-05",
@@ -84,7 +84,7 @@ export const products: Product[] = [
     description:
       "Pflegeleichter Mischgewebe-Kasack, 60 °C waschbar und trockneroptimiert. Vier Taschen für Stethoskop, Stift und Handschuhe.",
     badges: ["Bestseller"],
-    imageSeed: "krueger-kasack-comfort",
+    imageId: 5327649,
   },
   {
     id: "p-06",
@@ -97,7 +97,7 @@ export const products: Product[] = [
     description:
       "Elastischer Bund mit Tunnelzug, seitliche Eingrifftaschen, atmungsaktives Mischgewebe für lange Schichten.",
     badges: [],
-    imageSeed: "krueger-jogger-medizin",
+    imageId: 4586989,
   },
   {
     id: "p-07",
@@ -110,7 +110,7 @@ export const products: Product[] = [
     description:
       "Flüssigkeitsabweisendes Baumwollgewebe, Druckknopfleiste, Brust- und Seitentaschen. Normgerecht für Labor und Praxis.",
     badges: ["DGUV-zertifiziert"],
-    imageSeed: "krueger-laborkittel",
+    imageId: 6129502,
   },
   {
     id: "p-08",
@@ -123,7 +123,7 @@ export const products: Product[] = [
     description:
       "Doppelreihige Knopfleiste, hitzeisolierender Kragen, verstärkte Nähte. 100 % Baumwolle für hohen Tragekomfort in der Küche.",
     badges: ["Bestseller"],
-    imageSeed: "krueger-kochjacke",
+    imageId: 5779791,
   },
   {
     id: "p-09",
@@ -136,7 +136,7 @@ export const products: Product[] = [
     description:
       "Robuste Baumwoll-Polyester-Mischung, zwei geräumige Fronttaschen, verstellbarer Nackenriemen.",
     badges: [],
-    imageSeed: "krueger-servierschuerze",
+    imageId: 5920775,
   },
   {
     id: "p-10",
@@ -149,7 +149,7 @@ export const products: Product[] = [
     description:
       "Zertifiziert nach EN ISO 20347, rutschhemmende Sohle SRC, atmungsaktives Obermaterial, leicht zu reinigen.",
     badges: ["SRC zertifiziert"],
-    imageSeed: "krueger-gastro-schuhe",
+    imageId: 2529148,
   },
   {
     id: "p-11",
@@ -162,7 +162,7 @@ export const products: Product[] = [
     description:
       "Handgearbeitete Cordjacke nach traditionellem Schnitt, Perlmuttknöpfe, verstärkte Ellenbogen. Für Gesellenwanderung und Zunfttreffen.",
     badges: ["Handgefertigt"],
-    imageSeed: "krueger-zunftjacke-cord",
+    imageId: 3814573,
   },
   {
     id: "p-12",
@@ -175,7 +175,7 @@ export const products: Product[] = [
     description:
       "Klassische Samtweste mit sechs Perlmuttknöpfen, gefüttert, nach überlieferter Zunftordnung geschnitten.",
     badges: [],
-    imageSeed: "krueger-zunftweste-samt",
+    imageId: 36277130,
   },
 ];
 
