@@ -44,6 +44,7 @@ const KIRI_DASH_SPEED := 20.0
 const KIRI_DASH_TIME := 0.28
 const KIRI_COOLDOWN := 1.4
 const KIRI_SLIDE_SPEED := 12.0
+const KIRI_SLIDE_TIME := 0.35
 
 const ATTACK_TIME := [0.30, 0.30, 0.50]
 const ATTACK_HIT_AT := [0.10, 0.10, 0.18]
@@ -250,12 +251,13 @@ func _state_normal(delta: float, on_floor: bool) -> void:
 		_start_slide(dir, SLIDE_SPEED)
 	elif input.consume("attack"):
 		_try_attack()
-	input.consume("interact")
+	if input.consume("interact"):
+		_try_interact()
 
 
-func _start_slide(dir: Vector3, spd: float) -> void:
+func _start_slide(dir: Vector3, spd: float, duration := SLIDE_TIME) -> void:
 	state = State.SLIDE
-	state_time = SLIDE_TIME
+	state_time = duration
 	slide_dir = dir
 	slide_speed = spd
 	face_dir = dir
@@ -367,7 +369,7 @@ func _state_dash(delta: float) -> void:
 				state_time = 0.05
 				velocity = dash_dir * 6.0
 			else:
-				_start_slide(dash_dir, KIRI_SLIDE_SPEED)
+				_start_slide(dash_dir, KIRI_SLIDE_SPEED, KIRI_SLIDE_TIME)
 
 
 func _state_glide(delta: float) -> void:
@@ -423,6 +425,21 @@ func _sync_visual() -> void:
 	visual.gliding = state == State.GLIDE
 	visual.blink = invuln > 0.0 and state != State.DEAD
 	visual.visible = state != State.DEAD
+
+
+# ------------------------------------------------------------------ Interaktion
+
+func _try_interact() -> void:
+	var best: Node = null
+	var best_d := 999.0
+	for it in get_tree().get_nodes_in_group("interactables"):
+		if it.can_use(self):
+			var d := global_position.distance_to(it.global_position)
+			if d < best_d:
+				best_d = d
+				best = it
+	if best != null:
+		best.use(self)
 
 
 # ------------------------------------------------------------------ Kampf

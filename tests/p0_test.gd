@@ -44,6 +44,7 @@ func reset(p: CharacterBody3D, pos: Vector3) -> void:
 
 func _run() -> void:
 	main = load("res://scenes/main.tscn").instantiate()
+	main.level_script = load("res://scripts/world/test_track.gd")
 	root.add_child(main)
 	await frames(30)
 	lumi = main.players[0]

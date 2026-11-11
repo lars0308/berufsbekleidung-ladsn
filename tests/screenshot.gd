@@ -1,29 +1,37 @@
 extends SceneTree
-## Erzeugt einen Screenshot des Splitscreens (braucht ein echtes, ggf. virtuelles Display).
-## Start: xvfb-run -a godot --path . --rendering-method gl_compatibility --script res://tests/screenshot.gd -- <ausgabe.png>
+## Screenshot des Splitscreens (braucht ein echtes, ggf. virtuelles Display, z. B. xvfb).
+## xvfb-run -a godot --path . --rendering-driver opengl3 --rendering-method gl_compatibility \
+##   --resolution 1280x720 --script res://tests/screenshot.gd -- out.png "lx,ly,lz,lyaw" "kx,ky,kz,kyaw"
+## (Yaw in Grad: 0 = Blick nach -Z, -90 = nach +X, 90 = nach -X)
 
 func _initialize() -> void:
 	call_deferred("_run")
 
 
+func _parse(s: String) -> Array:
+	var v := s.split(",")
+	return [Vector3(float(v[0]), float(v[1]), float(v[2])), deg_to_rad(float(v[3]))]
+
+
 func _run() -> void:
-	var out := "/tmp/shot.png"
-	var args := OS.get_cmdline_user_args()
-	if args.size() > 0:
-		out = args[0]
+	var a := OS.get_cmdline_user_args()
+	var out: String = a[0] if a.size() > 0 else "/tmp/shot.png"
 	var main: Control = load("res://scenes/main.tscn").instantiate()
 	root.add_child(main)
-	for i in 20:
+	for i in 10:
 		await process_frame
 	for p in main.players:
 		p.input.scripted = true
-	main.players[0].global_position = Vector3(-9, 0.2, -14)
-	main.players[1].global_position = Vector3(9, 0.2, -16)
-	main.players[0].input.move = Vector2(0, -0.01)
-	main.rigs[0].yaw = 0.35
-	main.rigs[0].snap_to_target()
-	main.rigs[1].snap_to_target()
-	for i in 25:
+	for i in 2:
+		if a.size() > 1 + i:
+			var d := _parse(a[1 + i])
+			main.players[i].global_position = d[0]
+			main.players[i].velocity = Vector3.ZERO
+			main.rigs[i].yaw = d[1]
+			main.players[i].face_dir = Vector3(-sin(d[1]), 0, -cos(d[1]))
+			main.rigs[i].snap_to_target()
+			main.moods[i] = main.level.mood_at(d[0])
+	for i in 14:
 		await process_frame
 	await RenderingServer.frame_post_draw
 	root.get_viewport().get_texture().get_image().save_png(out)

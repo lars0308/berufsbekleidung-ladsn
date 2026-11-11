@@ -1,9 +1,10 @@
 extends Area3D
-## Checkpoint-Fahne: Betreten durch einen Spieler setzt den gemeinsamen Respawn-Punkt.
+## Checkpoint-Fahne. hero = -1: gilt für beide; 0/1: nur für diesen Spieler (getrennte Routen).
 
 signal activated(cp)
 
 var active := false
+var hero := -1
 var _flag_mat: StandardMaterial3D
 
 
@@ -42,6 +43,8 @@ func _ready() -> void:
 
 func _on_body(body: Node3D) -> void:
 	if active or not body.is_in_group("players"):
+		return
+	if hero >= 0 and body.hero != hero:
 		return
 	active = true
 	_flag_mat.albedo_color = Color("7dffb0")
