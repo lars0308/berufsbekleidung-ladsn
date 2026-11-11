@@ -10,6 +10,16 @@ Ein süßes 3D-Koop-Abenteuer für zwei Spieler an einem PC: Zwei kleine Aliens,
 1. Godot 4.3 öffnen, `project.godot` importieren (erster Import dauert, Assets werden verarbeitet).
 2. `F5`.
 
-## Stand: P0 (Basis, Teststrecke)
+## Stand
 
-Gehen, Sprinten, Springen (Coyote-Time, Eingabe-Puffer, variable Höhe), Rutschen, Lumis Licht-Dash mit Gleiten, Kiris Schatten-Dash durch Schattentore, 3er-Kombo, hüpfender Gegner, Checkpoint, Respawn, Pause, Controller-Abzug-Erkennung, HUD pro Bildschirmhälfte. Figuren sind noch Platzhalter aus Formen.
+- **P0 Basis:** Splitscreen, zwei Xbox-Controller, Bewegung, Lumis Licht-Dash mit Gleiten, Kiris Schatten-Dash, 3er-Kombo, Gegner, Checkpoints, Pause.
+- **Level 1 "Getrennt unter zwei Sonnen":** getrennte Routen (sonnig / Schatten), Lichtung mit der Fee Zirp, Koop-Rätsel (Kristall -> Schattenplatte -> Schattenbrücke -> Wurzeltor), Aussichtspunkt mit Schiffswrack.
+- Figuren sind noch Platzhalter aus Formen. Level 2, Intro, Menü, Einstellungen und Sound fehlen noch.
+
+## Tests
+
+```
+godot --headless --import --path .
+godot --headless --path . --fixed-fps 120 --script res://tests/p0_test.gd      # Mechanik auf der Teststrecke
+godot --headless --path . --fixed-fps 120 --script res://tests/level1_test.gd  # Bot läuft beide Routen + Rätsel
+```

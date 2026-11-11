@@ -4,11 +4,11 @@ extends RefCounted
 
 const SUNNY := {
 	"top": Color("4fa8ff"), "horizon": Color("ffe3a8"), "ground": Color("7bbf6a"),
-	"ambient": 0.62, "fog": Color("ffe9c4"), "fog_density": 0.0022, "glow": 0.3,
+	"ambient": 0.62, "ambient_color": Color("ffffff"), "fog": Color("ffe9c4"), "fog_density": 0.0022, "glow": 0.3,
 }
 const SHADOW := {
 	"top": Color("1b1646"), "horizon": Color("7a46b5"), "ground": Color("150f30"),
-	"ambient": 0.85, "fog": Color("5b3a98"), "fog_density": 0.009, "glow": 0.9,
+	"ambient": 0.8, "ambient_color": Color("a98bff"), "fog": Color("5b3a98"), "fog_density": 0.009, "glow": 0.9,
 }
 
 
@@ -20,7 +20,7 @@ static func make_environment() -> Environment:
 	var env := Environment.new()
 	env.background_mode = Environment.BG_SKY
 	env.sky = sky
-	env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
+	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	env.glow_enabled = true
 	env.glow_bloom = 0.1
@@ -37,6 +37,7 @@ static func apply_mood(env: Environment, t: float) -> void:
 	m.ground_horizon_color = m.sky_horizon_color
 	m.ground_bottom_color = SUNNY["ground"].lerp(SHADOW["ground"], t)
 	env.ambient_light_energy = lerpf(SUNNY["ambient"], SHADOW["ambient"], t)
+	env.ambient_light_color = SUNNY["ambient_color"].lerp(SHADOW["ambient_color"], t)
 	env.fog_light_color = SUNNY["fog"].lerp(SHADOW["fog"], t)
 	env.fog_density = lerpf(SUNNY["fog_density"], SHADOW["fog_density"], t)
 	env.glow_intensity = lerpf(SUNNY["glow"], SHADOW["glow"], t)

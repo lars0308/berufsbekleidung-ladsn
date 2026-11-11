@@ -14,7 +14,7 @@ Die Zuordnung ist fest (XInput-Slot 0 und 1). Ist für einen Spieler kein Contro
 | Spezialfähigkeit | Y | K | / |
 | Rutschen | B | L | , |
 | Sprinten (halten) | RT oder linker Stick-Klick | Shift | Strg |
-| Interagieren (noch ohne Funktion) | LB | E | \ |
+| Interagieren (Kristalle, Schattenplatte) | LB | E | \ |
 | Pause | Start | Esc / P | Esc / P |
 | Vollbild | – | F11 | F11 |
 
