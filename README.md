@@ -1,41 +1,28 @@
-# Berufskleidungshaus Krüger — Online-Shop
+# Unser Spiel
 
-Next.js (App Router, static export) für den Online-Shop von Berufskleidungshaus
-Krüger in Lindhorst: Mehrseiten-Shop, 3D-Anprobe-Konfigurator (React Three
-Fiber), Warenkorb/Checkout (UI-Flow ohne echte Zahlungsabwicklung) und
-rechtssichere Seiten.
+Ein Koop-Rätselspiel für zwei, gespielt am geteilten Bildschirm (Splitscreen) – gebaut mit **Godot 4.3+**.
 
-## Entwicklung
+## Spielprinzip
 
-```bash
-npm install
-npm run dev
-```
+Ihr steuert zwei Figuren mit unterschiedlichen Fähigkeiten. Beide müssen gleichzeitig auf ihrem Zielfeld stehen.
 
-Öffne [http://localhost:3000](http://localhost:3000).
+| Figur | Steuerung | Fähigkeit |
+|-------|-----------|-----------|
+| 🦊 Fuchs | `W A S D` oder Controller 1 | passt durch schmale Spalte (`~`), kann nichts schieben |
+| 🐻 Bär | Pfeiltasten oder Controller 2 | schiebt Kisten, passt nicht durch Spalte |
 
-## Build (statischer HTML-Export)
+- **Druckplatten** öffnen Türen gleicher Farbe, solange eine Figur oder Kiste darauf steht.
+- `R` startet das Level neu, `Enter` geht nach dem Lösen zum nächsten Level.
 
-```bash
-npm run build
-```
+## Starten
 
-Erzeugt reines HTML/CSS/JS im Ordner `out/` (kein Server nötig,
-`next.config.ts` setzt `output: "export"`).
+1. [Godot 4.3 oder neuer](https://godotengine.org/download) installieren.
+2. Diesen Ordner im Projektmanager importieren (`project.godot`).
+3. `F5` drücken.
 
-## Deployment auf GitHub Pages
+## Aufbau
 
-`.github/workflows/deploy-pages.yml` baut bei jedem Push automatisch und
-veröffentlicht `out/` auf GitHub Pages. Damit das greift, muss im Repository
-unter **Settings → Pages → Source** einmalig auf **GitHub Actions**
-umgestellt werden.
-
-## Struktur
-
-- `src/app/` — Seiten (Startseite, `/shop`, `/konfigurator`, `/warenkorb`,
-  `/checkout`, `/login`, `/registrieren`, Rechtsseiten)
-- `src/components/` — UI-, Layout-, Shop-, Konfigurator- und
-  Warenkorb-Komponenten
-- `src/lib/` — Produktdaten (Platzhalter), Warenkorb-Store (Zustand),
-  Cookie-Consent
-- `.claude/skills/` — Claude-Code-Skills für Design, Animation und 3D
+- `scenes/main.tscn` – Startszene
+- `scripts/main.gd` – Splitscreen (zwei Kameras, gemeinsame Welt), Eingaben, Anzeige
+- `scripts/level.gd` – Spiellogik und Zeichnen
+- `scripts/levels.gd` – alle Level als Text-Karten (neue Level einfach ergänzen)
