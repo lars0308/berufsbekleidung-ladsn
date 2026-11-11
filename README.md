@@ -1,28 +1,15 @@
-# Unser Spiel
+# Lumi & Kiri
 
-Ein Koop-Rätselspiel für zwei, gespielt am geteilten Bildschirm (Splitscreen) – gebaut mit **Godot 4.3+**.
+Ein süßes 3D-Koop-Abenteuer für zwei Spieler an einem PC: Zwei kleine Aliens, Lumi (Licht) und Kiri (Schatten), sind auf einem fremden Dschungelplaneten gestrandet, haben sich verloren und müssen einander und ihr Raumschiff finden.
 
-## Spielprinzip
-
-Ihr steuert zwei Figuren mit unterschiedlichen Fähigkeiten. Beide müssen gleichzeitig auf ihrem Zielfeld stehen.
-
-| Figur | Steuerung | Fähigkeit |
-|-------|-----------|-----------|
-| 🦊 Fuchs | `W A S D` oder Controller 1 | passt durch schmale Spalte (`~`), kann nichts schieben |
-| 🐻 Bär | Pfeiltasten oder Controller 2 | schiebt Kisten, passt nicht durch Spalte |
-
-- **Druckplatten** öffnen Türen gleicher Farbe, solange eine Figur oder Kiste darauf steht.
-- `R` startet das Level neu, `Enter` geht nach dem Lösen zum nächsten Level.
+- Godot **4.3**, lokaler Koop mit **zwei Xbox-Controllern**, ständiger vertikaler **Splitscreen**
+- Steuerung: [CONTROLS.md](CONTROLS.md), Quellen: [CREDITS.md](CREDITS.md)
 
 ## Starten
 
-1. [Godot 4.3 oder neuer](https://godotengine.org/download) installieren.
-2. Diesen Ordner im Projektmanager importieren (`project.godot`).
-3. `F5` drücken.
+1. Godot 4.3 öffnen, `project.godot` importieren (erster Import dauert, Assets werden verarbeitet).
+2. `F5`.
 
-## Aufbau
+## Stand: P0 (Basis, Teststrecke)
 
-- `scenes/main.tscn` – Startszene
-- `scripts/main.gd` – Splitscreen (zwei Kameras, gemeinsame Welt), Eingaben, Anzeige
-- `scripts/level.gd` – Spiellogik und Zeichnen
-- `scripts/levels.gd` – alle Level als Text-Karten (neue Level einfach ergänzen)
+Gehen, Sprinten, Springen (Coyote-Time, Eingabe-Puffer, variable Höhe), Rutschen, Lumis Licht-Dash mit Gleiten, Kiris Schatten-Dash durch Schattentore, 3er-Kombo, hüpfender Gegner, Checkpoint, Respawn, Pause, Controller-Abzug-Erkennung, HUD pro Bildschirmhälfte. Figuren sind noch Platzhalter aus Formen.

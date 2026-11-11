@@ -1,143 +1,176 @@
 extends Control
-## Hauptszene: Splitscreen für zwei Spieler auf einem Bildschirm.
-## Links der Fuchs (WASD / Controller 1), rechts der Bär (Pfeiltasten / Controller 2).
+## Hauptszene: permanenter vertikaler Splitscreen (links Lumi, rechts Kiri), eine gemeinsame 3D-Welt.
 
-const Level := preload("res://scripts/level.gd")
-const Levels := preload("res://scripts/levels.gd")
+const PlayerScript := preload("res://scripts/player/player.gd")
+const CameraRigScript := preload("res://scripts/player/camera_rig.gd")
+const TrackScript := preload("res://scripts/world/test_track.gd")
+const HudScript := preload("res://scripts/hud.gd")
+const Atmosphere := preload("res://scripts/world/atmosphere.gd")
 
-var level: Node2D
+## Feste Controller-Zuordnung (XInput-Slot 0 und 1).
+const DEVICES := [0, 1]
+const HERO_COLORS := [Color("ffd36b"), Color("a98bff")]
+
+var world := World3D.new()
 var viewports: Array[SubViewport] = []
-var cameras: Array[Camera2D] = []
-var hud: Label
-var banner: Label
-var level_index := 0
+var rigs: Array = []
+var players: Array = []
+var level: Node3D
+var paused_for_pad := false
+var _pause_label: Label
+var _status: Label
+var _status_timer := 0.0
 
 
 func _ready() -> void:
-	_setup_inputs()
-	_build_splitscreen()
-	_build_labels()
-	level = Level.new()
-	level.solved.connect(_on_solved)
-	viewports[0].add_child(level)
-	_start_level(0)
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	world.environment = Atmosphere.make_environment()
+	_build_views()
+	_build_level()
+	_build_players()
+	_build_hud()
+	_build_overlay()
+	Input.joy_connection_changed.connect(_on_joy_changed)
+	_refresh_status()
 
 
-func _setup_inputs() -> void:
-	var keys := [
-		{"up": KEY_W, "down": KEY_S, "left": KEY_A, "right": KEY_D},
-		{"up": KEY_UP, "down": KEY_DOWN, "left": KEY_LEFT, "right": KEY_RIGHT},
-	]
-	var pad_buttons := {
-		"up": JOY_BUTTON_DPAD_UP, "down": JOY_BUTTON_DPAD_DOWN,
-		"left": JOY_BUTTON_DPAD_LEFT, "right": JOY_BUTTON_DPAD_RIGHT,
-	}
-	var pad_axes := {
-		"up": [JOY_AXIS_LEFT_Y, -1.0], "down": [JOY_AXIS_LEFT_Y, 1.0],
-		"left": [JOY_AXIS_LEFT_X, -1.0], "right": [JOY_AXIS_LEFT_X, 1.0],
-	}
-	for who in 2:
-		for dir in keys[who]:
-			var action := "p%d_%s" % [who, dir]
-			if not InputMap.has_action(action):
-				InputMap.add_action(action, 0.5)
-			var key := InputEventKey.new()
-			key.physical_keycode = keys[who][dir]
-			InputMap.action_add_event(action, key)
-			var button := InputEventJoypadButton.new()
-			button.device = who
-			button.button_index = pad_buttons[dir]
-			InputMap.action_add_event(action, button)
-			var motion := InputEventJoypadMotion.new()
-			motion.device = who
-			motion.axis = pad_axes[dir][0]
-			motion.axis_value = pad_axes[dir][1]
-			InputMap.action_add_event(action, motion)
-	if not InputMap.has_action("restart"):
-		InputMap.add_action("restart")
-	var r := InputEventKey.new()
-	r.physical_keycode = KEY_R
-	InputMap.action_add_event("restart", r)
-	var y_button := InputEventJoypadButton.new()
-	y_button.button_index = JOY_BUTTON_Y
-	InputMap.action_add_event("restart", y_button)
-
-
-func _build_splitscreen() -> void:
-	var box := HBoxContainer.new()
-	box.set_anchors_preset(Control.PRESET_FULL_RECT)
-	box.add_theme_constant_override("separation", 4)
-	add_child(box)
-	for who in 2:
-		var container := SubViewportContainer.new()
-		container.stretch = true
-		container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		container.size_flags_vertical = Control.SIZE_EXPAND_FILL
-		box.add_child(container)
+func _build_views() -> void:
+	var row := HBoxContainer.new()
+	row.set_anchors_preset(Control.PRESET_FULL_RECT)
+	row.add_theme_constant_override("separation", 4)
+	add_child(row)
+	for i in 2:
+		var c := SubViewportContainer.new()
+		c.stretch = true
+		c.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		c.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		row.add_child(c)
 		var vp := SubViewport.new()
-		container.add_child(vp)
+		vp.world_3d = world
+		vp.msaa_3d = Viewport.MSAA_2X
+		vp.handle_input_locally = false
+		c.add_child(vp)
 		viewports.append(vp)
-		var cam := Camera2D.new()
-		cam.zoom = Vector2(1.25, 1.25)
-		vp.add_child(cam)
-		cam.make_current()
-		cameras.append(cam)
-	# Beide Ansichten zeigen dieselbe Welt.
-	viewports[1].world_2d = viewports[0].world_2d
 
 
-func _build_labels() -> void:
-	hud = _make_label(20)
-	hud.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-	hud.offset_top = 8
-	banner = _make_label(40)
-	banner.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	banner.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	banner.visible = false
+func _build_level() -> void:
+	level = Node3D.new()
+	level.set_script(TrackScript)
+	level.process_mode = Node.PROCESS_MODE_PAUSABLE
+	viewports[0].add_child(level)
+	level.checkpoint_changed.connect(_on_checkpoint)
 
 
-func _make_label(font_size: int) -> Label:
-	var label := Label.new()
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	label.add_theme_font_size_override("font_size", font_size)
-	label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
-	label.add_theme_constant_override("outline_size", 8)
-	add_child(label)
-	return label
+func _build_players() -> void:
+	var offsets := [Vector3(-1.5, 0, 0), Vector3(1.5, 0, 0)]
+	for i in 2:
+		var p := CharacterBody3D.new()
+		p.set_script(PlayerScript)
+		p.setup(i, i, DEVICES[i])
+		p.position = level.spawn_point + offsets[i]
+		level.add_child(p)
+		players.append(p)
+		var rig := Node3D.new()
+		rig.set_script(CameraRigScript)
+		rig.process_mode = Node.PROCESS_MODE_PAUSABLE
+		rig.setup(p, p.input)
+		viewports[i].add_child(rig)
+		p.camera_rig = rig
+		rigs.append(rig)
+		p.spawn_position = p.position
 
 
-func _start_level(index: int) -> void:
-	level_index = index % Levels.LEVELS.size()
-	level.load_level(Levels.LEVELS[level_index]["map"])
-	banner.visible = false
-	_follow_players()
+func _on_checkpoint(pos: Vector3) -> void:
+	var offsets := [Vector3(-1.5, 0, 0), Vector3(1.5, 0, 0)]
+	for i in 2:
+		players[i].spawn_position = pos + offsets[i]
 
 
-func _follow_players() -> void:
-	for who in 2:
-		cameras[who].position = level.visual[who] + Vector2(Level.CELL, Level.CELL) / 2.0
+func _build_hud() -> void:
+	var row := HBoxContainer.new()
+	row.set_anchors_preset(Control.PRESET_FULL_RECT)
+	row.add_theme_constant_override("separation", 4)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(row)
+	var names := ["LUMI", "KIRI"]
+	for i in 2:
+		var h := Control.new()
+		h.set_script(HudScript)
+		h.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		h.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		row.add_child(h)
+		h.setup(players[i], names[i], HERO_COLORS[i])
 
 
-func _update_hud() -> void:
-	var data: Dictionary = Levels.LEVELS[level_index]
-	hud.text = "Level %d/%d – %s   |   Züge: %d\n%s\nFuchs: WASD · Bär: Pfeiltasten · R: Neustart" % [
-		level_index + 1, Levels.LEVELS.size(), data["name"], level.moves, data["hint"]]
+func _build_overlay() -> void:
+	_status = Label.new()
+	_status.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
+	_status.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	_status.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	_status.offset_bottom = -12
+	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_status.add_theme_font_size_override("font_size", 18)
+	_status.add_theme_color_override("font_outline_color", Color.BLACK)
+	_status.add_theme_constant_override("outline_size", 8)
+	_status.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_status)
+	_pause_label = Label.new()
+	_pause_label.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_pause_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_pause_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_pause_label.add_theme_font_size_override("font_size", 42)
+	_pause_label.add_theme_color_override("font_outline_color", Color.BLACK)
+	_pause_label.add_theme_constant_override("outline_size", 14)
+	_pause_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_pause_label.visible = false
+	add_child(_pause_label)
 
 
-func _on_solved() -> void:
-	var last := level_index == Levels.LEVELS.size() - 1
-	banner.text = "Geschafft in %d Zügen!\n%s" % [
-		level.moves,
-		"Ihr habt alle Level gelöst!\nEnter: von vorn beginnen" if last else "Enter: nächstes Level",
-	]
-	banner.visible = true
+func _refresh_status() -> void:
+	var parts: PackedStringArray = []
+	for i in 2:
+		var pad: bool = players[i].input.has_pad()
+		parts.append("%s: %s" % [["Lumi", "Kiri"][i], "Controller %d" % (DEVICES[i] + 1) if pad else "Tastatur"])
+	_status.text = "   |   ".join(parts) + "   |   Start = Pause   F11 = Vollbild"
 
 
-func _process(_delta: float) -> void:
-	_follow_players()
-	_update_hud()
-	if Input.is_action_just_pressed("restart"):
-		_start_level(level_index)
-	elif level.done and Input.is_action_just_pressed("ui_accept"):
-		_start_level(level_index + 1)
+func _process(delta: float) -> void:
+	_status_timer -= delta
+	if _status_timer <= 0.0:
+		_status_timer = 1.0
+		_refresh_status()
+
+
+func set_paused(on: bool, message := "") -> void:
+	get_tree().paused = on
+	_pause_label.visible = on
+	if on:
+		_pause_label.text = message if message != "" else "PAUSE\nStart: weiter"
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventJoypadButton and event.pressed and event.button_index == JOY_BUTTON_START:
+		if paused_for_pad and not _all_pads_ok():
+			return
+		paused_for_pad = false
+		set_paused(not get_tree().paused)
+	elif event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_ESCAPE or event.keycode == KEY_P:
+			set_paused(not get_tree().paused)
+		elif event.keycode == KEY_F11:
+			var full := DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN
+			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if full else DisplayServer.WINDOW_MODE_FULLSCREEN)
+
+
+func _all_pads_ok() -> bool:
+	for i in 2:
+		if not Input.get_connected_joypads().has(DEVICES[i]):
+			return false
+	return true
+
+
+func _on_joy_changed(device: int, connected: bool) -> void:
+	_refresh_status()
+	if not connected and DEVICES.has(device):
+		paused_for_pad = true
+		set_paused(true, "Controller %d getrennt\nBitte wieder anschließen, dann Start" % (device + 1))
